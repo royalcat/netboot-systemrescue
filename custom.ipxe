@@ -1,12 +1,31 @@
 #!ipxe
 ###
-### netboot.xyz-custom menu
+### netboot.xyz-custom menu example
 ###
 
-:start
-echo Hello world!
-sleep 10
+:custom
+clear custom_choice
+menu Default
+item --gap Default
+item systemrescue ${space} Loading a kernel and initrd
+item --gap netboot.xyz
+item netbootxyz ${space} Loads Official netboot.xyz
+choose custom_choice || goto custom_exit
+echo ${cls}
+goto ${custom_choice}
 goto custom_exit
+
+
+:systemrescue
+set url ${live_endpoint}/asset-mirror/releases/download/10.02-182f0000/
+imgfree
+kernel ${url}vmlinuz archisobasedir=sysresccd ${ipparam} archiso_http_srv=${url} initrd=initrd.magic ${cmdline}
+initrd ${url}initrd
+boot
+
+:netbootxyz
+echo Chains into another menu...
+chain http://boot.netboot.xyz/menu.ipxe
 
 :custom_exit
 exit 0
